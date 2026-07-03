@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "pnpm --parallel --filter './apps/*' run dev",
+    "dev:fe": "pnpm --filter './apps/frontend' run dev",
+    "dev:be": "pnpm --filter './apps/backend' run dev",
+    "dev:studio": "pnpm --filter './apps/studio-crumb-haus' run dev"
   },
   "keywords": [],
   "author": "",
