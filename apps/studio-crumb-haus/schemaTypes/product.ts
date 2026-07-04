@@ -19,6 +19,11 @@ export const product = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'blurb',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'description',
       type: 'array',
       title: 'Content',
@@ -57,9 +62,7 @@ export const product = defineType({
       name: 'hasCustomisation',
       title: 'Has Customisation',
       type: 'boolean',
-      options: {
-        layout: 'checkbox'
-      }
+      initialValue: false,
     }),
     defineField({
       name: 'sizes',

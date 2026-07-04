@@ -12,4 +12,10 @@ export default defineCliConfig({
      */
     autoUpdates: true,
   },
+  schemaExtraction: {
+    enabled: true
+  },
+  typegen: {
+    enabled: true
+  }
 })

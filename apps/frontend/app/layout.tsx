@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Barlow_Condensed, Jost } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 
 const jost = Jost({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-sans" });
 const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-display" });
@@ -18,7 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full antialiased", jost.variable, barlowCondensed.variable)}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
+      </body>
     </html>
   );
 }
