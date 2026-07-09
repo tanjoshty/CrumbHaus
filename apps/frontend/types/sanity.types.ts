@@ -74,7 +74,24 @@ export type Product = {
     _type: 'size'
     _key: string
   }>
+  colours?: Array<{
+    label?: string
+    color?: Color
+    _type: 'colour'
+    _key: string
+  }>
   active?: boolean
+}
+
+export type Color = {
+  _type: 'color'
+  hex?: string
+  rgba?: string
+  hsl?: string
+  isGradient?: boolean
+  hex2?: string
+  angle?: number
+  css?: string
 }
 
 export type SanityImageCrop = {
@@ -211,6 +228,7 @@ export type AllSanitySchemaTypes =
   | CategoryReference
   | SanityImageAssetReference
   | Product
+  | Color
   | SanityImageCrop
   | SanityImageHotspot
   | Category

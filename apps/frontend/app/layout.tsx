@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
+import { Toaster } from '@/components/ui/sonner'
 
 const jost = Jost({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-sans" });
 const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-display" });
@@ -26,6 +27,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

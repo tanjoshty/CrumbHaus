@@ -101,6 +101,42 @@ export const product = defineType({
       validation: (rule) => rule.min(1),
     }),
     defineField({
+      name: 'colours',
+      title: 'Colours',
+      description:
+        'Colour options a customer can choose — price does not vary by colour. Please include a hexadecimal of the colour you want to display on the website',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'colour',
+          fields: [
+            defineField({
+              name: 'label',
+              type: 'string',
+              description: 'e.g. "Burgundy"',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'color',
+              title: 'Colour',
+              type: 'color',
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            select: {title: 'label', subtitle: 'color.hex'},
+            prepare({title, subtitle}) {
+              return {
+                title,
+                subtitle: subtitle !== undefined ? subtitle : undefined,
+              }
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
       name: 'active',
       type: 'boolean',
       initialValue: true,

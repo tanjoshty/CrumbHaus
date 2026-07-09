@@ -7,9 +7,9 @@ interface Props {
   description?: Product["description"];
   hasCustomisation?: boolean;
   name?: string;
-  sizes?: Product["sizes"];
   slug?: Slug;
-  price?: number;
+  colours?: Product["colours"];
+  id?: Product["_id"];
 }
 
 export function ProductDetails({
@@ -17,21 +17,21 @@ export function ProductDetails({
   description,
   hasCustomisation,
   name,
-  sizes,
   slug,
-  price,
+  colours,
+  id,
 }: Props) {
   return (
     <div className="px-14 py-14 flex flex-col gap-4">
-      <ProductContent 
+      <ProductContent
         description={description}
         name={name}
-        price={price}
       />
-      <ProductVariants 
+      <ProductVariants
         flavours={flavours}
         hasCustomisation={hasCustomisation}
-        sizes={sizes}
+        colours={colours}
+        id={id}
       />
     </div>
   )
