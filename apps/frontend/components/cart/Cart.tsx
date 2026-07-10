@@ -60,9 +60,10 @@ export function Cart({
                 <li key={item.lineId} className="flex gap-4 px-5 py-5">
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-black text-[20px] text-ink uppercase leading-none mb-2">
-                      {item.variations.size}
+                      {item.name}
                     </p>
                     <div className="flex flex-col gap-0.5 text-[12px] font-light text-ink/70">
+                      <span>Size: {item.variations.size}</span>
                       <span>Flavour: {item.variations.flavour}</span>
                       {item.variations.colour && (
                         <span>Colour: {item.variations.colour}</span>

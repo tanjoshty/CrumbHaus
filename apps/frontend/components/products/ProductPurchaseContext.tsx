@@ -7,10 +7,10 @@ type Size = NonNullable<Product['sizes']>[number]
 
 interface PurchaseState {
   selectedSizeLabel?: string
-  selectedColour: string
-  selectedFlavour: string
+  selectedColour?: string
+  selectedFlavour?: string
   date?: Date
-  notes: string
+  notes?: string
 }
 
 type PurchaseAction =
@@ -40,8 +40,8 @@ function purchaseReducer(state: PurchaseState, action: PurchaseAction): Purchase
 function initState(sizes?: Product['sizes']): PurchaseState {
   return {
     selectedSizeLabel: sizes?.[0]?.label,
-    selectedColour: 'Cobalt',
-    selectedFlavour: 'Select Flavour',
+    selectedColour: undefined,
+    selectedFlavour: undefined,
     date: undefined,
     notes: '',
   }
@@ -51,13 +51,15 @@ interface ProductPurchaseContextValue {
   sizes?: Product['sizes']
   selectedSize?: Size
   selectSize: (label: string) => void
-  selectedColour: string
+  colours?: Product['colours']
+  selectedColour?: string
   selectColour: (label: string) => void
-  selectedFlavour: string
+  flavours?: Product['flavors']
+  selectedFlavour?: string
   selectFlavour: (flavour: string) => void
   date?: Date
   setDate: (date: Date | undefined) => void
-  notes: string
+  notes?: string
   setNotes: (notes: string) => void
 }
 
@@ -65,10 +67,12 @@ const ProductPurchaseContext = createContext<ProductPurchaseContextValue | null>
 
 interface ProviderProps {
   sizes?: Product['sizes']
+  flavours?: Product['flavors']
+  colours?: Product['colours']
   children: ReactNode
 }
 
-export function ProductPurchaseProvider({ sizes, children }: ProviderProps) {
+export function ProductPurchaseProvider({ sizes, colours, flavours, children }: ProviderProps) {
   const [state, dispatch] = useReducer(purchaseReducer, sizes, initState)
   const selectedSize = sizes?.find((size) => size.label === state.selectedSizeLabel)
 
@@ -76,8 +80,10 @@ export function ProductPurchaseProvider({ sizes, children }: ProviderProps) {
     sizes,
     selectedSize,
     selectSize: (label) => dispatch({ type: 'SELECT_SIZE', label }),
+    colours,
     selectedColour: state.selectedColour,
     selectColour: (label) => dispatch({ type: 'SELECT_COLOUR', label }),
+    flavours,
     selectedFlavour: state.selectedFlavour,
     selectFlavour: (flavour) => dispatch({ type: 'SELECT_FLAVOUR', flavour }),
     date: state.date,

@@ -5,54 +5,66 @@ import { useProductPurchase } from './ProductPurchaseContext'
 import { ProductDatePicker } from './ProductDatePicker'
 import { CartItem } from '@/types/cart.types';
 import { useCartStore } from '@/store/useCartStore';
+import { useState } from 'react';
 
 interface Props {
-  flavours?: string[];
   hasCustomisation?: boolean;
-  colours?: Product["colours"];
-  id?: Product["_id"]
+  id?: Product["_id"];
+  name?: string;
 }
 
 export function ProductVariants({
-  flavours,
   hasCustomisation,
-  colours,
   id,
+  name,
 }: Props) {
   const {
     sizes,
     selectedSize,
     selectSize,
+    colours,
     selectedColour,
     selectColour,
+    flavours,
     selectedFlavour,
     selectFlavour,
     notes,
     setNotes,
-    date
+    date,
   } = useProductPurchase()
+
+  const [hasValidationError, setHasValidationError] = useState<boolean>(false)
 
   const {
     addItem,
     openCart,
   } = useCartStore()
 
+  const requiresColour = Boolean(colours?.length)
+
   const handleAddToCart = () => {
+    if (!selectedSize || !selectedFlavour || !date || (requiresColour && !selectedColour)) {
+      setHasValidationError(true)
+      return
+    }
+
     const cartItem: CartItem = {
       lineId: crypto.randomUUID(),
-      productId: id || '',
-      price: selectedSize?.price || 0,
+      productId: id ?? '',
+      price: selectedSize.price ?? 0,
       variations: {
-        size: selectedSize?.label || '',
+        size: selectedSize.label ?? '',
         flavour: selectedFlavour,
         colour: selectedColour,
       },
-      deliveryDate: date?.toDateString() || '',
-      notes: notes,
+      deliveryDate: date.toDateString(),
+      notes: notes ?? '',
+      name: name ?? '',
     }
-    addItem(cartItem);
+
+    addItem(cartItem)
     toast.success("Added to cart", {
-      action: { label: "View cart", onClick: openCart }
+      action: { label: "View cart", onClick: openCart },
     })
   }
 
@@ -62,7 +74,7 @@ export function ProductVariants({
       {sizes?.length && 
         <div>
           <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-ink/60 mb-3">
-            Size <span className="text-cobalt ml-2">{selectedSize?.label}</span>
+            Size <span className="text-cobalt ml-2"><FieldError show={hasValidationError && !selectedSize} message="Please select a size" />{selectedSize?.label}</span>
           </p>
           <div className="flex gap-2.5">
             {sizes.map((s) => (
@@ -85,7 +97,7 @@ export function ProductVariants({
       { colours && 
         <div>
           <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-ink/60 mb-3">
-            Colour <span className="text-cobalt ml-2">{selectedColour}</span>
+            Colour <span className="text-cobalt ml-2"><FieldError show={hasValidationError && !selectedColour} message="Please select a colour" />{selectedColour}</span>
           </p>
           <div className="flex gap-3">
             {colours.map((c) => (
@@ -103,7 +115,7 @@ export function ProductVariants({
       {flavours?.length && 
         <div>
           <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-ink/60 mb-3">
-            Flavour <span className="text-cobalt ml-2">{selectedFlavour}</span>
+            Flavour <span className="text-cobalt ml-2"><FieldError show={hasValidationError && !selectedFlavour} message="Please select a flavour" />{selectedFlavour}</span>
           </p>
           <div className="flex flex-wrap gap-2.5">
             {flavours.map((f) => (
@@ -124,7 +136,7 @@ export function ProductVariants({
       {/* Date */}
       <div>
         <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-ink/60 mb-3">
-          Pickup / Delivery Date
+          Pickup / Delivery Date <FieldError show={hasValidationError && !date} message="Please select a date" />
         </p>
         <div className="border border-cream-border p-4 flex items-center justify-between gap-4">
           <p className="text-[11px] font-light text-ink/60">We need at least 5 days notice</p>
@@ -159,4 +171,9 @@ export function ProductVariants({
       </p>
     </div>
   )
+}
+
+function FieldError({ show, message }: { show: boolean; message: string }) {
+  if (!show) return null
+  return <span className="text-red-500">{message}</span>
 }

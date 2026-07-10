@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Toaster } from '@/components/ui/sonner'
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const jost = Jost({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-sans" });
 const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-display" });
@@ -23,11 +24,12 @@ export default function RootLayout({
     <html lang="en" className={cn("h-full antialiased", jost.variable, barlowCondensed.variable)}>
       <body className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow">
+        <main className="grow">
           {children}
         </main>
         <Footer />
         <Toaster />
+        <CartDrawer />
       </body>
     </html>
   );

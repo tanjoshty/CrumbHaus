@@ -17,6 +17,7 @@ export type CartStore = CartState & CartActions;
 
 export interface CartItem {
   lineId: string;
+  name: string;
   productId: string;
   price: number;
   variations: CartItemVariations;

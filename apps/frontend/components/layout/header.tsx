@@ -1,20 +1,27 @@
+'use client'
+import { useCartStore } from '@/store/useCartStore'
 import Link from 'next/link'
 
 export function Header() {
+  const {
+    cartItems,
+    openCart,
+  } = useCartStore();
+
   const navItems = [
-  {
-    label: "Cakes",
-    link: "/products"
-  },
-  {
-    label: "About",
-    link: "#"
-  },
-  {
-    label: "Contact",
-    link: "#"
-  },
-]
+    {
+      label: "Cakes",
+      link: "/products"
+    },
+    {
+      label: "About",
+      link: "#"
+    },
+    {
+      label: "Contact",
+      link: "#"
+    },
+  ]
   return (
     <nav className="flex justify-between items-center px-12 py-[18px] border-b border-cream-border bg-cream sticky top-0 z-10">
       <Link href="/" className="font-display font-black text-[22px] text-cobalt tracking-[0.06em] uppercase">
@@ -30,8 +37,8 @@ export function Header() {
         ))}
       </div>
 
-      <button className="bg-cobalt text-cream text-[11px] font-medium tracking-[0.12em] uppercase px-[22px] py-[10px] cursor-pointer">
-        Cart (0)
+      <button onClick={openCart} className="bg-cobalt text-cream text-[11px] font-medium tracking-[0.12em] uppercase px-[22px] py-[10px] cursor-pointer">
+        Cart ({cartItems.length})
       </button>
     </nav>
   )
