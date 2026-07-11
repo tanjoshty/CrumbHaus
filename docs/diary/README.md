@@ -12,4 +12,5 @@ it's fresh. Each entry aims to answer three questions:
 
 ## Entries
 
+- [2026-07-11 — Cart operational + schema reshape](./2026-07-11-cart-and-schema.md)
 - [2026-07-09 — Week 1](./2026-07-09-week-01.md)
