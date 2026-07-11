@@ -31,7 +31,7 @@ export function ProductCard({product}: {product: Product}) {
               {product.tag}
             </span>
             {startingPrice !== undefined && (
-              <span className="font-display font-extrabold text-xl text-ink">
+              <span className="font-display font-extrabold text-xl text-burgundy">
                 From ${startingPrice}
               </span>
             )}

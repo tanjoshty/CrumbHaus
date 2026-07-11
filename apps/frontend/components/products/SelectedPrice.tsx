@@ -7,7 +7,7 @@ export function SelectedPrice() {
 
   return (
     <div className="text-right mt-1">
-      <p className="font-display font-black text-[42px] text-ink leading-none">
+      <p className="font-display font-black text-[42px] text-burgundy leading-none">
         ${selectedSize?.price}
       </p>
     </div>

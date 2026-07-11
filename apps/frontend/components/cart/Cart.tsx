@@ -74,7 +74,7 @@ export function Cart({
                   </div>
 
                   <div className="flex flex-col items-end justify-between shrink-0">
-                    <span className="font-display font-extrabold text-lg text-ink">
+                    <span className="font-display font-extrabold text-lg text-burgundy">
                       ${item.price}
                     </span>
                     <button
@@ -98,7 +98,7 @@ export function Cart({
             <span className="text-[11px] font-medium tracking-[0.16em] uppercase text-ink/60">
               Total
             </span>
-            <span className="font-display font-black text-[28px] text-ink leading-none">
+            <span className="font-display font-black text-[28px] text-burgundy leading-none">
               ${total}
             </span>
           </div>

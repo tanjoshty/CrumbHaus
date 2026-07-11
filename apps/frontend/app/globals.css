@@ -5,10 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-cream: #F5EDD3;
+  --color-cream: #FAF3E2; 
+  --color-cream-light: #FDF9EE; 
+  --color-cream-border: #E9DFC0;
+  --color-paper: #FFFDF7;
   --color-cobalt: #2350B5;
+  --color-cobalt-dark: #1A3A8A;
   --color-ink: #12205A;
-  --muted: #8B7355
+  --color-burgundy: #7B2D3A;
+  --color-burgundy-dark: #5E1F2A;
+  --muted: #8B7355;
+  --animate-marquee: marquee 20s linear infinite;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }
 
 @theme inline {
