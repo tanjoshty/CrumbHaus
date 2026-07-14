@@ -1,159 +1,86 @@
-# Cake Platform — Project Plan
+# CrumbHaus
 
-## Overview
-A full-stack cake ordering platform for a small business. Customers browse and order cakes; admins manage orders and products. Built to professional standards as a learning project with real AWS infrastructure.
+A cake ordering platform for a small, made-to-order home cake business. Customers browse the catalogue, configure a cake (size, flavour, colour, pickup/delivery date, notes), and pay via Stripe. An admin manages orders and the catalogue. Built as a learning project, deliberately kept lean.
 
----
-
-## Goals
-- [ ] Customer-facing storefront: browse cakes, view details, place orders
-- [ ] Checkout with Stripe payments
-- [ ] Customer account: order history, order status
-- [ ] Admin dashboard: manage products, view and update orders
-- [ ] Strapi CMS integration (later phase): manage site content, images, SEO
-- [ ] Production-grade AWS infrastructure
+It is really two things: a **product catalogue** (content-shaped, in Sanity) and a **made-to-order booking system** with per-day capacity and per-item dates (transactional, in Supabase).
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- **Next.js** (App Router) + **React** + **TypeScript**
-- SSR/Server Components for catalogue pages (SEO + performance)
-- Client components for interactive UI (cart, checkout, auth flows)
-- Tailwind CSS for styling
+- **Next.js 16** (App Router, React 19, TypeScript) — frontend **and** backend. API routes / server actions under `app/api/*` hold all trusted logic; there is no separate backend service.
+- **Sanity** — product catalogue and image CDN. Source of truth for cakes, variants, and images. Standalone Studio in `apps/studio-crumb-haus/`.
+- **Supabase** — Postgres (orders, customers, capacity) + Auth (password-based). DDL in `db/schema.sql`.
+- **Stripe** — embedded Checkout + webhooks for payment.
+- **Tailwind CSS 4** (CSS-first `@theme`, no config file) + **shadcn/ui** (Base UI variant).
+- **pnpm workspaces** monorepo.
+- **AWS via SST** — the Next app deploys to AWS (Lambda + CloudFront + S3, using OpenNext under SST) as infrastructure-as-code. Chosen over Vercel because SST is already familiar: pay-per-use (~free at hobby volume) rather than a flat plan, and no commercial-use restriction. The managed services (Sanity, Supabase, Stripe) mean AWS only hosts the stateless Next app — no VPC/RDS/container orchestration needed. (Cold starts are inherent to serverless on either AWS or Vercel; a non-issue at this traffic.)
 
-### Backend
-- **Express.js** + **Node.js** + **TypeScript**
-- Stateless REST API — all business logic lives here
-- Handles auth verification, orders, payments, admin operations
-- Runs on port `5000` inside its Docker container
+---
 
-### Auth
-- **Supabase Auth** — JWT-based, managed service
-- Frontend handles sign-in/sign-up via Supabase client
-- Express middleware verifies Supabase JWT on every protected route
+## Architecture
 
-### Database
-- **Supabase PostgreSQL**
-- ORM: **Drizzle** (TypeScript-first, lightweight)
-- Use Supabase's **PgBouncer pooling connection string** in ECS (not direct connection) to avoid hitting connection limits
+```
+Browser ──▶ Next.js on AWS (Lambda + CloudFront, deployed via SST)
+              ├─ Server Components / API routes  ── read catalogue ──▶ Sanity (+ image CDN)
+              │                                   ── orders / capacity / auth ──▶ Supabase (Postgres + Auth)
+              │                                   ── create session / verify webhook ──▶ Stripe
+              └─ Client Components (cart, checkout UI)
+```
 
-### Payments
-- **Stripe** — checkout and payment intents
-- Stripe webhooks hit Express BE to update order state
+- **Catalogue** is read from Sanity (Server Components fetch via `next-sanity`; TypeGen'd types).
+- **Cart** is client-side (Zustand, persisted to localStorage).
+- **Orders / customers / capacity** live in Supabase Postgres. Orders link to Sanity products by id (`order_item.sanity_product_id`) with a `variations` jsonb snapshot — no cross-system FK.
+- **Payments** go through Stripe; the Stripe webhook is what actually writes a confirmed order.
 
-### CMS (later phase)
-- **Strapi** — self-hosted, deployed as its own ECS service
-- Manages homepage content, images, SEO metadata
-- Frontend fetches Strapi content at build/request time
+### Checkout & capacity flow
 
-### Monorepo
-- **pnpm workspaces**
-- Shared TypeScript types in `packages/shared` (e.g. `Order`, `Product`, `User`)
+1. Client posts the cart to `app/api/checkout`.
+2. Server validates the requested date has capacity, **recomputes prices from Sanity** (never trusts the client cart), reserves the slot, and creates a Stripe Checkout Session (inline `price_data`).
+3. Stripe's embedded form collects payment on the checkout page.
+4. `checkout.session.completed` → write the order + items to Supabase, keep the reservation, confirm.
+5. `checkout.session.expired` / cancellation → release the reserved slot.
+
+Capacity is counted in **cakes per day** (`weekly_capacity.max_items` for recurring weekdays, `capacity_override` for specific dates; `0` = closed). Fulfilment date is per line item.
 
 ---
 
 ## Directory Structure
 
 ```
-cake-platform/
-├── package.json              # pnpm workspaces root
-├── packages/
-│   └── shared/               # Shared TypeScript types & utils
-│       └── src/types/
-├── frontend/                 # Next.js app
-│   ├── Dockerfile
-│   └── src/
-│       ├── app/              # App Router pages
-│       ├── components/
-│       └── lib/              # API client, Supabase client
-└── backend/                  # Express API
-    ├── Dockerfile
-    └── src/
-        ├── controllers/      # HTTP layer — req/res handling
-        ├── services/         # Business logic
-        ├── models/           # Drizzle schemas & queries
-        ├── middleware/       # Auth, error handler, rate limiting
-        └── server.ts
+CrumbHaus/
+├── apps/
+│   ├── frontend/            # Next.js app (UI + API routes)
+│   │   ├── app/             # App Router pages + app/api/* routes
+│   │   ├── components/      # products, cart, checkout, layout, ui (shadcn)
+│   │   ├── lib/             # sanity + supabase clients
+│   │   ├── store/           # Zustand cart store
+│   │   └── types/           # generated Sanity types, cart types
+│   └── studio-crumb-haus/   # standalone Sanity Studio (product schemas)
+├── db/schema.sql            # Supabase Postgres DDL (run manually)
+├── docs/diary/              # dev diary (decisions & progress)
+└── package.json             # pnpm workspace root
 ```
 
 ---
 
-## AWS Infrastructure
+## Getting Started
 
-```
-Internet
-   │
-   ▼
-CloudFront (CDN, caching, SSL termination)
-   │
-   ▼
-ALB (Application Load Balancer)
-   ├── /* ──────────────────▶ ECS Service: Frontend (2 tasks, Next.js)
-   └── /api/* ──────────────▶ ECS Service: Backend  (2 tasks, Express)
-                                       │
-                                       ▼
-                               Supabase (PostgreSQL + Auth)
-                               Stripe API
+```bash
+pnpm install
+pnpm dev          # all apps in parallel
+pnpm dev:fe       # Next app only (port 3000)
+pnpm dev:studio   # Sanity Studio only (port 3333)
 ```
 
-- **ECS Fargate** — serverless containers, no EC2 to manage
-- **2 tasks per service** — high availability, ECS handles restarts
-- **Auto-scaling** on CPU/memory per service
-- All services live inside a **VPC**; only ALB is public-facing
-- Supabase is external (managed), accessed over SSL
-
-### Later: Strapi
-- Add a third ECS service behind `/cms/*` or a separate subdomain
-- Attach an EBS volume or S3 bucket for media uploads
+Frontend env (`apps/frontend/.env.local`): Supabase URL/key, Sanity project id/dataset, and (when wired) Stripe keys + webhook secret.
 
 ---
 
-## CI/CD — GitHub Actions
+## Status
 
-- **On PR:** lint, type-check, run tests
-- **On merge to main:** build Docker images → push to ECR → deploy to ECS (rolling update)
-- Separate workflows for `frontend/` and `backend/` (path-filtered)
-- Secrets stored in GitHub Actions secrets / AWS Secrets Manager
+**Done:** product catalogue (Sanity schemas + Studio), storefront (PLP, PDP with gallery/variants/date picker), cart (Zustand + drawer), checkout UI, brand/design system, database schema design, guest-checkout modelling.
 
----
+**Next:** order-placement + capacity endpoints (`app/api/checkout`), Stripe embedded checkout + webhooks, confirmation email, admin order management, applying the schema to Supabase.
 
-## Phases
-
-### Phase 1 — Foundation
-- Monorepo setup, shared types, Docker configs
-- Express API skeleton with Supabase auth middleware
-- Next.js app with Supabase auth (sign in, sign up, session)
-- Basic product catalogue (read from DB, SSR)
-
-### Phase 2 — Ordering
-- Cart (client state or lightweight server session)
-- Stripe checkout integration
-- Order creation on BE, Stripe webhook → order status update
-- Customer order history page
-
-### Phase 3 — Admin
-- Admin-only middleware on BE routes
-- Admin dashboard: view all orders, update order status
-- Product management: create, edit, delete cakes
-
-### Phase 4 — Infrastructure
-- Dockerise both services
-- Set up VPC, ECS Fargate, ALB, CloudFront on AWS
-- GitHub Actions CI/CD pipeline
-- Environment config (dev / staging / prod)
-
-### Phase 5 — CMS (Strapi)
-- Spin up Strapi, define content types (homepage, SEO, banners)
-- Frontend fetches Strapi content at request time
-- Deploy Strapi as its own ECS service
-
----
-
-## Key Decisions & Notes
-- Supabase JWT verified in Express middleware — FE never hits DB directly for mutations
-- Drizzle ORM: use PgBouncer pooling URL in production
-- Stripe webhooks are unauthenticated endpoints — verify with Stripe signature, not Supabase JWT
-- Strapi introduced only after core ordering flow is stable
-- EKS explicitly out of scope — ECS Fargate is sufficient
+See `docs/diary/` for the running log of decisions and rationale.
