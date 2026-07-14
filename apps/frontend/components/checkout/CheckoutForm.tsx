@@ -4,26 +4,19 @@ import * as React from "react"
 import { useState } from "react"
 
 import { CartItem } from "@/types/cart.types"
+import { useCartStore } from "@/store/useCartStore"
 
 interface CheckoutFormProps {
-  items?: CartItem[]
-  total?: number
   /** Wire this to your submit/order-placement logic. */
   onPlaceOrder?: () => void
 }
-
-/**
- * Dumb, presentational one-page checkout (Shopify-style: contact → fulfilment →
- * payment stacked on the left, order summary on the right). No store access, no
- * submission logic, no real payment integration — plumb it yourself.
- *
- * NOTE: the Payment section is a non-functional visual placeholder. Do NOT ship
- * raw card inputs — swap this block for Stripe Elements / PaymentElement before
- * going live (collecting raw card numbers yourself is a PCI problem).
- */
-export function CheckoutForm({ items = [], total = 0, onPlaceOrder }: CheckoutFormProps) {
+export function CheckoutForm({onPlaceOrder }: CheckoutFormProps) {
+  const {
+    cartItems,
+    total
+  } = useCartStore();
   const [fulfillment, setFulfillment] = useState<"pickup" | "delivery">("pickup")
-  const isEmpty = items.length === 0
+  const isEmpty = cartItems.length === 0
 
   return (
     <div className="bg-cream text-ink min-h-screen">
@@ -97,7 +90,7 @@ export function CheckoutForm({ items = [], total = 0, onPlaceOrder }: CheckoutFo
             </p>
           ) : (
             <ul className="divide-y divide-cream-border">
-              {items.map((item) => (
+              {cartItems.map((item) => (
                 <li key={item.lineId} className="flex gap-4 px-6 py-5">
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-black text-[18px] text-ink uppercase leading-none mb-1.5">
