@@ -1,5 +1,5 @@
 {
-  "name": "crumb-haus",
+  "name": "crumb-studio",
   "private": true,
   "version": "1.0.0",
   "main": "package.json",
@@ -16,10 +16,10 @@
   ],
   "dependencies": {
     "@sanity/icons": "^3.8.0",
-    "@sanity/vision": "^6.3.0",
+    "@sanity/vision": "^6.4.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "sanity": "^6.3.0",
+    "sanity": "^6.4.0",
     "sanity-plugin-color-input": "^1.3.1",
     "styled-components": "^6.1.18"
   },

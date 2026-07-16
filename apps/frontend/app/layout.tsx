@@ -11,7 +11,7 @@ const jost = Jost({ subsets: ["latin"], weight: ["300", "400", "500"], variable:
 const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-display" });
 
 export const metadata: Metadata = {
-  title: "CrumbHaus",
+  title: "CrumbStudio",
   description: "Order custom cakes online",
 };
 

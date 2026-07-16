@@ -38,17 +38,40 @@ CREATE TABLE order_item (
 );
 
 -- ── Capacity ──────────────────────────────────────────────────────────────────
+-- Two independent axes:
+--   1. CAPACITY  — how many cakes a pool can fulfil per week (capacity_pool + the
+--      weekly_capacity weekday→pool map, with per-week count changes in
+--      capacity_override).
+--   2. OPENNESS  — whether a specific date is bookable at all (date_closure).
+-- A date is bookable iff it is not closed AND its pool still has room that week.
 
-CREATE TABLE weekly_capacity (
-  id          uuid     PRIMARY KEY DEFAULT gen_random_uuid(),
-  day_of_week smallint NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),  -- 0 = Mon
-  max_items   integer  NOT NULL CHECK (max_items >= 0),  -- max cakes fulfillable on this weekday
-  active_from date     NOT NULL
+-- A capacity pool: one weekly slot count, shared by whatever weekdays map to it.
+-- e.g. Mon–Thu all map to one pool with max 1 = one cake across the whole block per week.
+CREATE TABLE capacity_pool (
+  key       text    PRIMARY KEY,       -- e.g. 'mon_thu', 'fri', 'sat', 'sun'
+  max_items integer NOT NULL CHECK (max_items >= 0)
 );
 
+-- Maps each weekday to its pool. 0 = Mon … 6 = Sun. Weekdays sharing a pool_key
+-- share that pool's single weekly count.
+CREATE TABLE weekly_capacity (
+  day_of_week smallint PRIMARY KEY CHECK (day_of_week BETWEEN 0 AND 6),
+  pool_key    text     NOT NULL REFERENCES capacity_pool(key)
+);
+
+-- Change a pool's count for one specific week (rare — a big or quiet week).
+-- week_start = the Monday of the target week. 0 = closed for that pool-week.
 CREATE TABLE capacity_override (
-  id         uuid    PRIMARY KEY DEFAULT gen_random_uuid(),
-  date       date    NOT NULL UNIQUE,
-  max_items  integer NOT NULL CHECK (max_items >= 0),  -- 0 = closed
-  note       text
+  pool_key   text    NOT NULL REFERENCES capacity_pool(key),
+  week_start date    NOT NULL,
+  max_items  integer NOT NULL CHECK (max_items >= 0),
+  note       text,
+  PRIMARY KEY (pool_key, week_start)
+);
+
+-- Specific dates the baker is unavailable — presence = closed, independent of pool
+-- capacity (e.g. away one Monday, but Tue–Thu still share the mon_thu pool's slot).
+CREATE TABLE date_closure (
+  date date PRIMARY KEY,
+  note text
 );

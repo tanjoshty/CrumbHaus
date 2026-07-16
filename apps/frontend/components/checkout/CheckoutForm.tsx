@@ -1,7 +1,6 @@
 "use client"
 
-import * as React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { CartItem } from "@/types/cart.types"
 import { useCartStore } from "@/store/useCartStore"
@@ -17,6 +16,22 @@ export function CheckoutForm({onPlaceOrder }: CheckoutFormProps) {
   } = useCartStore();
   const [fulfillment, setFulfillment] = useState<"pickup" | "delivery">("pickup")
   const isEmpty = cartItems.length === 0
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch('/api/checkout', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: 'Hello from client' }),
+      });
+      const data = await res.json()
+      console.log("data: ", data)
+      return data;
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="bg-cream text-ink min-h-screen">

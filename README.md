@@ -1,4 +1,4 @@
-# CrumbHaus
+# CrumbStudio
 
 A cake ordering platform for a small, made-to-order home cake business. Customers browse the catalogue, configure a cake (size, flavour, colour, pickup/delivery date, notes), and pay via Stripe. An admin manages orders and the catalogue. Built as a learning project, deliberately kept lean.
 
@@ -9,7 +9,7 @@ It is really two things: a **product catalogue** (content-shaped, in Sanity) and
 ## Tech Stack
 
 - **Next.js 16** (App Router, React 19, TypeScript) — frontend **and** backend. API routes / server actions under `app/api/*` hold all trusted logic; there is no separate backend service.
-- **Sanity** — product catalogue and image CDN. Source of truth for cakes, variants, and images. Standalone Studio in `apps/studio-crumb-haus/`.
+- **Sanity** — product catalogue and image CDN. Source of truth for cakes, variants, and images. Standalone Studio in `apps/studio/`.
 - **Supabase** — Postgres (orders, customers, capacity) + Auth (password-based). DDL in `db/schema.sql`.
 - **Stripe** — embedded Checkout + webhooks for payment.
 - **Tailwind CSS 4** (CSS-first `@theme`, no config file) + **shadcn/ui** (Base UI variant).
@@ -48,7 +48,7 @@ Capacity is counted in **cakes per day** (`weekly_capacity.max_items` for recurr
 ## Directory Structure
 
 ```
-CrumbHaus/
+CrumbStudio/
 ├── apps/
 │   ├── frontend/            # Next.js app (UI + API routes)
 │   │   ├── app/             # App Router pages + app/api/* routes
@@ -56,7 +56,7 @@ CrumbHaus/
 │   │   ├── lib/             # sanity + supabase clients
 │   │   ├── store/           # Zustand cart store
 │   │   └── types/           # generated Sanity types, cart types
-│   └── studio-crumb-haus/   # standalone Sanity Studio (product schemas)
+│   └── studio/              # standalone Sanity Studio (product schemas)
 ├── db/schema.sql            # Supabase Postgres DDL (run manually)
 ├── docs/diary/              # dev diary (decisions & progress)
 └── package.json             # pnpm workspace root

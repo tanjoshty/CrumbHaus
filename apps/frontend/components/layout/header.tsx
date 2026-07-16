@@ -25,7 +25,7 @@ export function Header() {
   return (
     <nav className="flex justify-between items-center px-12 py-[18px] border-b border-cream-border bg-cream sticky top-0 z-10">
       <Link href="/" className="font-display font-black text-[22px] text-cobalt tracking-[0.06em] uppercase">
-        Crumb Haus
+        Crumb Studio
       </Link>
 
       <div className="flex gap-9">

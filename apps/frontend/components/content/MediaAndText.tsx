@@ -9,7 +9,7 @@ export function MediaAndText() {
           Made From<br />Scratch
         </h2>
         <p className="text-[15px] font-light leading-[1.8] text-cream/75">
-          Every Crumb Haus cake is made to order, by hand, using real
+          Every Crumb Studio cake is made to order, by hand, using real
           ingredients. No mixes, no shortcuts — just honest baking for the
           moments that matter.
         </p>

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CrumbHaus is a cake ordering platform for a small, made-to-order home cake business. Customers browse and order cakes; an admin manages orders and the catalogue. Stack: **Next.js** (frontend **and** backend via API routes), **Sanity** (product catalogue + image CDN — source of truth for products), **Supabase** (Postgres for orders/customers/capacity + Auth), **Stripe** (embedded checkout + webhooks). See `README.md` for the architecture overview and `db/schema.sql` for the database design.
+CrumbStudio is a cake ordering platform for a small, made-to-order home cake business. Customers browse and order cakes; an admin manages orders and the catalogue. Stack: **Next.js** (frontend **and** backend via API routes), **Sanity** (product catalogue + image CDN — source of truth for products), **Supabase** (Postgres for orders/customers/capacity + Auth), **Stripe** (embedded checkout + webhooks). See `README.md` for the architecture overview and `db/schema.sql` for the database design.
 
 There is no separate backend service — an earlier Express app (`apps/backend`) was removed. All server logic lives in the Next app.
 
@@ -12,7 +12,7 @@ There is no separate backend service — an earlier Express app (`apps/backend`)
 
 pnpm workspaces:
 - `apps/frontend/` — Next.js 16 + React 19 + Tailwind CSS 4 + shadcn/ui (port 3000). Hosts the UI **and** the backend (Next API routes / server actions).
-- `apps/studio-crumb-haus/` — standalone Sanity Studio for the product catalogue (port 3333)
+- `apps/studio/` — standalone Sanity Studio for the product catalogue (port 3333)
 - `packages/` — shared TypeScript types (not yet populated)
 - `db/schema.sql` — Postgres DDL for Supabase, run manually in the SQL editor
 

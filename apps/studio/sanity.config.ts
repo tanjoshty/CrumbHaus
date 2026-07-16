@@ -6,7 +6,7 @@ import {schemaTypes} from './schemaTypes'
 
 export default defineConfig({
   name: 'default',
-  title: 'Crumb Haus',
+  title: 'Crumb Studio',
 
   projectId: 'grc0mz56',
   dataset: 'production',

@@ -1,6 +1,6 @@
 # Dev Diary
 
-Running log of progress, decisions, and rationale for CrumbHaus.
+Running log of progress, decisions, and rationale for CrumbStudio.
 
 Entries are dated files in this folder. The cadence is roughly weekly, but an
 entry per working session is fine too — whatever captures the reasoning while

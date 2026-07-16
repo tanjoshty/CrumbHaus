@@ -1,12 +1,12 @@
 {
-  "name": "CrumbHaus",
+  "name": "CrumbStudio",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' run dev",
     "dev:fe": "pnpm --filter './apps/frontend' run dev",
-    "dev:studio": "pnpm --filter './apps/studio-crumb-haus' run dev"
+    "dev:studio": "pnpm --filter './apps/studio' run dev"
   },
   "keywords": [],
   "author": "",
